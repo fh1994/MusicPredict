@@ -13,7 +13,7 @@ print(__doc__)
 # Author: Peter Prettenhofer <peter.prettenhofer@gmail.com>
 #
 # License: BSD 3 clause
-
+import evaluation
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -40,7 +40,7 @@ params = {'n_estimators': 500, 'max_depth': 4, 'min_samples_split': 1,
 clf = ensemble.GradientBoostingRegressor(**params)
 
 clf.fit(X_train, y_train)
-mse = mean_squared_error(y_test, clf.predict(X_test))
+mse = evaluation.Fij(y_test, clf.predict(X_test))
 print("MSE: %.4f" % mse)
 
 ###############################################################################
