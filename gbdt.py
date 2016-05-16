@@ -1,53 +1,92 @@
-"""
-============================
-Gradient Boosting regression
-============================
-
-Demonstrate Gradient Boosting on the Boston housing dataset.
-
-This example fits a Gradient Boosting model with least squares loss and
-500 regression trees of depth 4.
-"""
-print(__doc__)
-
-# Author: Peter Prettenhofer <peter.prettenhofer@gmail.com>
-#
-# License: BSD 3 clause
+import datetime
+import datahandle
 import evaluation
 import numpy as np
-import matplotlib.pyplot as plt
 
 from sklearn import ensemble
-from sklearn import datasets
-from sklearn.utils import shuffle
-from sklearn.metrics import mean_squared_error
 
-###############################################################################
-# Load data
+def simpleGbdt():
+    artists = datahandle.easyhandle()
+    mall = 0
+    for artist in artists:
+        test = artists[artist]
+        test = test.astype(np.float32)
+        X = test[:,0]
+        y = test[:,1]
+        offset = 62
+        X_train, y_train = X[offset:], y[offset:]
+        X_test, y_test = X[:offset], y[:offset]
 
-boston = datasets.load_boston()
-X, y = shuffle(boston.data, boston.target, random_state=13)
-X = X.astype(np.float32)
-offset = int(X.shape[0] * 0.9)
-X_train, y_train = X[:offset], y[:offset]
-X_test, y_test = X[offset:], y[offset:]
+        X_train = X_train.reshape(-1,1)
+        X_test = X_test.reshape(-1,1)
 
-###############################################################################
-# Fit regression model
+        params = {'n_estimators': 500, 'max_depth': 5, 'min_samples_split': 2,
+                  'learning_rate': 0.01, 'loss': 'ls'}
+        clf = ensemble.GradientBoostingRegressor(**params)
 
-params = {'n_estimators': 500, 'max_depth': 4, 'min_samples_split': 1,
-          'learning_rate': 0.01, 'loss': 'ls'}
-clf = ensemble.GradientBoostingRegressor(**params)
+        clf.fit(X_train, y_train)
+        mse = evaluation.Fij(y_test, clf.predict(X_test))
+        mall = mall + mse
+        print("Fij: %.4f" % mse)
 
-clf.fit(X_train, y_train)
-mse = evaluation.Fij(y_test, clf.predict(X_test))
-print("MSE: %.4f" % mse)
+    return mall
 
-###############################################################################
-# Plot training deviance
 
-# compute test set deviance
+def createSimpleAnswer():
+    output = open('mars_tianchi_artist_plays_predict.csv','w')
+    begindate = datetime.date(2015,9,1)
+    artists = datahandle.easyhandle()
+    for artist in artists:
+        test = artists[artist]
+        test = test.astype(np.float32)
+        X = test[:,0]
+        y = test[:,1]
+        X_train, y_train = X, y
 
+        X_train = X_train.reshape(-1,1)
+
+        params = {'n_estimators': 500, 'max_depth': 5, 'min_samples_split': 2,
+                  'learning_rate': 0.01, 'loss': 'ls'}
+        clf = ensemble.GradientBoostingRegressor(**params)
+        clf.fit(X_train, y_train)
+
+        xtest = y_train[-1]
+        ytest = 0
+        for i in range(60):
+            currentdate = begindate + datetime.timedelta(days = i)
+            ytest = clf.predict(xtest)
+            ytest = int(ytest)
+            output.write(artist+','+str(ytest)+','+str(currentdate).replace('-','')+'\n')
+            xtest = ytest
+    output.close()
+
+# replace simpleGbdt
+def onlyKsumGbdt(k):
+    artists = datahandle.onlyKsumHandle(k)
+    mall = 0
+    for artist in artists:
+        test = artists[artist]
+        test = test.astype(np.float32)
+        X = test[:,0]
+        y = test[:,1]
+        offset = 62
+        X_train, y_train = X[offset:], y[offset:]
+        X_test, y_test = X[:offset], y[:offset]
+
+        X_train = X_train.reshape(-1,1)
+        X_test = X_test.reshape(-1,1)
+
+        params = {'n_estimators': 500, 'max_depth': 5, 'min_samples_split': 2,
+                  'learning_rate': 0.01, 'loss': 'ls'}
+        clf = ensemble.GradientBoostingRegressor(**params)
+
+        clf.fit(X_train, y_train)
+        mse = evaluation.Fij(y_test, clf.predict(X_test))
+        mall = mall + mse
+        # print("Fij: %.4f" % mse)
+
+    return mall
+'''
 test_score = np.zeros((params['n_estimators'],), dtype=np.float64)
 
 for i, y_pred in enumerate(clf.staged_predict(X_test)):
@@ -63,10 +102,12 @@ plt.plot(np.arange(params['n_estimators']) + 1, test_score, 'r-',
 plt.legend(loc='upper right')
 plt.xlabel('Boosting Iterations')
 plt.ylabel('Deviance')
+'''
 
 ###############################################################################
 # Plot feature importance
 
+'''
 feature_importance = clf.feature_importances_
 # make importances relative to max importance
 feature_importance = 100.0 * (feature_importance / feature_importance.max())
@@ -78,3 +119,10 @@ plt.yticks(pos, boston.feature_names[sorted_idx])
 plt.xlabel('Relative Importance')
 plt.title('Variable Importance')
 plt.show()
+'''
+
+
+if __name__ == '__main__':
+    # createSimpleAnswer()
+    for k in range(1,30):
+        print(onlyKsumGbdt(k))
