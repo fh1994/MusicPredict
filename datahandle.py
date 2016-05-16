@@ -49,6 +49,18 @@ def onlyKsumHandle(k):
 
     return artists
 
+def averageHandle():
+    artists = easyhandle()
+    f = open('average.csv')
+    f.readline()
+    for i in f.readlines():
+        dd = i.split(',')
+        artist = dd[0]
+        for k in range(183):
+            artists[artist][k][0] = int(dd[1])
+
+    return artists
+
 if __name__ == '__main__':
-    artists = onlyKsumHandle(k=1)
+    artists = averageHandle()
     print(artists['8fb3cef29f2c266af4c9ecef3b780e97'])
