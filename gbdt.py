@@ -37,10 +37,10 @@ def simpleGbdt():
 ########################################################################
 ## simple create answer for dataset
 ########################################################################
-def createSimpleAnswer():
+def createSimpleAnswer(k):
     output = open('mars_tianchi_artist_plays_predict.csv','w')
     begindate = datetime.date(2015,9,1)
-    artists = datahandle.easyhandle()
+    artists = datahandle.onlyKsumHandle(k)
     for artist in artists:
         test = artists[artist]
         test = test.astype(np.float32)
@@ -54,7 +54,7 @@ def createSimpleAnswer():
                   'learning_rate': 0.01, 'loss': 'ls'}
         clf = ensemble.GradientBoostingRegressor(**params)
         clf.fit(X_train, y_train)
-
+        ##### axiba
         xtest = y_train[-1]
         ytest = 0
         for i in range(60):
