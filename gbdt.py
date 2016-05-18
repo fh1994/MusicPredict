@@ -94,7 +94,7 @@ def onlyKsumGbdt(k):
         X_train = X_train.reshape(-1,1)
         X_test = X_test.reshape(-1,1)
 
-        params = {'n_estimators': 500, 'max_depth': 3, 'min_samples_split': 1,
+        params = {'n_estimators': 1400, 'max_depth': 3, 'min_samples_split': 101,
                   'learning_rate': 0.01, 'loss': 'lad'}
         clf = ensemble.GradientBoostingRegressor(**params)
 
@@ -138,7 +138,7 @@ def createSimpleAnswer():
 
         X_train = X_train.reshape(-1,1)
 
-        params = {'n_estimators': 500, 'max_depth': 3, 'min_samples_split': 1,
+        params = {'n_estimators': 1400, 'max_depth': 3, 'min_samples_split': 101,
                   'learning_rate': 0.01, 'loss': 'lad'}
         clf = ensemble.GradientBoostingRegressor(**params)
         clf.fit(X_train, y_train)
@@ -156,8 +156,17 @@ def createSimpleAnswer():
 if __name__ == '__main__':
     createSimpleAnswer()
     # print(simpleGbdt())
+
+    # print(onlyKsumGbdt(1))
     '''
-    for k in range(1,30):
-       print(onlyKsumGbdt(k))
-    print(averageFeature())
+    max = [0,0]
+    for k in range(85,115):
+        x = onlyKsumGbdt(1,k)
+        if max[1] < x :
+            max[0] = k
+            max[1] = x
+        print('%d : %f'%(k,x))
+
+    print(max[0])
+    print(max[1])
 '''
