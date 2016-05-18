@@ -1,7 +1,7 @@
 from numpy import *
 import datetime
 
-def easyhandle():
+def easyAllhandle():
     f = open('result2.csv')
     artists = {}
     f.readline()
@@ -12,15 +12,14 @@ def easyhandle():
         artist = des[0]
         date = datetime.date(*[int(x) for x in des[1].split('-')])
         if artist in artists:
-            artists[artist][(date - basetime).days][1] = int(des[2])
+            pass
+            # artists[artist][(date - basetime).days][1] = int(des[2])
         else:
-            artists[artist] = zeros([183,2])
-            artists[artist][(date - basetime).days][1] = int(des[2])
+            artists[artist] = zeros([183,3])
 
-    for artist in artists:
-        for i in range(1,artists[artist].shape[0]):
-            artists[artist][i][0] = artists[artist][i-1][1]
-
+        artists[artist][(date - basetime).days][0] = int(des[3])
+        artists[artist][(date - basetime).days][1] = int(des[4])
+        artists[artist][(date - basetime).days][2] = int(des[2])
     return artists
 
 # replace easyhandle
@@ -61,6 +60,37 @@ def averageHandle():
 
     return artists
 
+def allonehandle():
+    artists = easyAllhandle()
+    aid = {}
+    basetime = datetime.date(2015,3,1)
+    train = []
+    artistid = 0
+    for artist in artists:
+        id = 0
+        if artist in aid:
+            # artists[artist][(date - basetime).days][1] = int(des[2])
+            id = aid[artist][0]
+        else:
+            id = artistid
+            aid[artist] = [id , artists[artist][0][0]]
+            artistid = artistid + 1
+
+        for i in range(len(artists[artist])):
+            if i != 0:
+                traincell = [id,i,artists[artist][i][0],artists[artist][i-1][2],artists[artist][i][2]]
+            # traino = [id,days,int(des[2]),int(des[4]),int(des[3]),int(des[2])]
+                train.append(traincell)
+
+    train = array(train)
+    train.astype(float32)
+
+    return train,aid,artists
+
 if __name__ == '__main__':
-    artists = averageHandle()
-    print(artists['8fb3cef29f2c266af4c9ecef3b780e97'])
+    # a = easyAllhandle()
+    # print(a['023406156015ef87f99521f3b343f71f'])
+    train = onlyKsumHandle(1)
+    for i in train:
+        print(train[i])
+    # print(train.dtype)
